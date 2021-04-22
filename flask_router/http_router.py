@@ -1,5 +1,5 @@
 from functools import wraps
-from typing import List
+from typing import List, Callable
 
 
 class HTTPRouter:
@@ -20,7 +20,7 @@ class HTTPRouter:
 
 
 class Route:
-    def __init__(self, endpoint, view_func, http_methods=None):
-        self.endpoint = endpoint
+    def __init__(self, endpoint: str, view_func: Callable, http_methods: list = None):
+        self.endpoint: str = endpoint
         self.view_func = view_func
         self.http_methods = http_methods or ['GET']
