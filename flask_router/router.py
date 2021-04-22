@@ -10,18 +10,27 @@ class Router:
 
     def use(self, namespace: str, router: HTTPRouter):
         for route in router.routes:
-            rule = f'{namespace}/{route.endpoint}'
-            endpoint = f'{namespace}.{route.view_func.__name__}'
+            rule = self.create_rule(namespace, route)
 
-            self.app.add_url_rule(
-                rule, endpoint, route.view_func, methods=route.http_methods)
+            if rule.view_func:
+                self.app.add_url_rule(
+                    rule.rule, rule.endpoint, rule.view_func, methods=route.http_methods)
 
-            rule = Rule(rule, endpoint, route.view_func)
-            self.rules.append(rule)
+                self.rules.append(rule)
+
+    def create_rule(self, namespace: str, route: Route):
+        endpoint = f'{namespace}.{route.view_func.__name__}'
+        rule = Rule(endpoint=endpoint, view_func=route.view_func)
+        if route.endpoint == '/':
+            rule.rule = namespace
+        else:
+            endpoint = route.endpoint.lstrip('/')
+            rule.rule = f'{namespace}/{route.endpoint}'
+        return rule
 
 
 class Rule:
-    def __init__(self, rule, endpoint, view_func):
+    def __init__(self, rule: str = '', endpoint: str = '', view_func: callable = None):
         self.rule = rule
         self.endpoint = endpoint
         self.view_func = view_func
