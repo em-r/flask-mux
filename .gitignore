@@ -1,0 +1,6 @@
+venv
+playground
+__pycache__
+.vscode/
+.DS_STORE
+.flaskenv
