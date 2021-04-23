@@ -1,6 +1,6 @@
-from flask_router import HTTPRouter
+from flask_mux import Router
 
-tc_1_router = HTTPRouter()
+tc_1_router = Router()
 
 
 @tc_1_router.get('/')

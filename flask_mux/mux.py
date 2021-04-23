@@ -1,14 +1,13 @@
 from flask import Flask
-from flask_router.http_router import HTTPRouter, Route
+from flask_mux.router import Router, Route
 
 
-class Router:
-
+class Mux:
     def __init__(self, app: Flask):
         self.app = app
         self.rules = []
 
-    def use(self, namespace: str, router: HTTPRouter):
+    def use(self, namespace: str, router: Router):
         for route in router.routes:
             rule = self.create_rule(namespace, route)
 

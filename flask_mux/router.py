@@ -2,7 +2,7 @@ from functools import wraps
 from typing import List, Callable
 
 
-class HTTPRouter:
+class Router:
     def __init__(self):
         self.routes: List[Route] = []
 

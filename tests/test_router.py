@@ -1,14 +1,14 @@
 import unittest
 import random
 from flask import Flask
-from flask_router import Router, HTTPRouter
+from flask_mux import Mux
 from tests.testcases import tc_1_router
 
 
 class TestRouterGet(unittest.TestCase):
     def setUp(self):
         self.app = Flask(__name__)
-        router = Router(self.app)
+        router = Mux(self.app)
         router.use('/', tc_1_router)
 
         self.client = self.app.test_client()
