@@ -1,5 +1,6 @@
 from flask import request
 from flask_mux import Router
+from tests.common import is_json, is_admin
 
 tc_default_router = Router()
 
@@ -22,3 +23,24 @@ def handle_post():
 @tc_default_router.route('/many', http_methods=['POST', 'GET'])
 def handle_many():
     return {'success': True, 'method': request.method}
+
+
+tc_mw_router = Router()
+
+
+@tc_mw_router.route('/one-mw', http_methods=['POST'])
+@is_json
+def handle_one_mw():
+    if isinstance(request.json, dict) or isinstance(request.json, list):
+        body = request.json
+    else:
+        body = {'body': request.json}
+    return {'success': True, 'body': body}, 200
+
+
+@tc_mw_router.route('/multi-mws', http_methods=['POST'])
+@is_admin
+@is_json
+def handle_multi_mws():
+    admin = request.headers.get('admin')
+    return {'success': True, 'admin': admin}, 200
