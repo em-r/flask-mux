@@ -6,9 +6,9 @@ class Router:
     def __init__(self):
         self.routes: List[Route] = []
 
-    def get(self, endpoint: str):
+    def route(self, endpoint: str, http_methods: list = None):
         def decorator(view_func):
-            route = Route(endpoint, view_func)
+            route = Route(endpoint, view_func, http_methods=http_methods)
             self.routes.append(route)
 
             @wraps(view_func)
