@@ -18,14 +18,14 @@ class Mux:
                 self.rules.append(rule)
 
     def create_rule(self, namespace: str, route: Route):
-        endpoint = f'{namespace}.{route.view_func.__name__}'
-        rule = Rule(endpoint=endpoint, view_func=route.view_func)
-        if route.endpoint == '/':
-            rule.rule = namespace
-        else:
-            endpoint = route.endpoint.lstrip('/')
-            rule.rule = f'{namespace}/{route.endpoint}'
-        return rule
+        _namespace = namespace.strip('/')
+        _endpoint = route.endpoint.strip('/')
+        if _namespace == '':
+            return Rule(route.endpoint, route.view_func.__name__, route.view_func)
+
+        url_rule = f'/{_namespace}/{_endpoint}'
+        endpoint = f'{_namespace}.{route.view_func.__name__}'
+        return Rule(url_rule, endpoint, route.view_func)
 
 
 class Rule:
@@ -33,3 +33,6 @@ class Rule:
         self.rule = rule
         self.endpoint = endpoint
         self.view_func = view_func
+
+    def __repr__(self):
+        return f'rule: {self.rule} | endpoint: {self.endpoint}'
