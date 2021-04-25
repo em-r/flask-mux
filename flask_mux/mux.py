@@ -2,6 +2,16 @@ from flask import Flask
 from flask_mux.router import Router, Route
 
 
+class Rule:
+    def __init__(self, rule: str = '', endpoint: str = '', view_func: callable = None):
+        self.rule = rule
+        self.endpoint = endpoint
+        self.view_func = view_func
+
+    def __repr__(self):
+        return f'rule: {self.rule} | endpoint: {self.endpoint}'
+
+
 class Mux:
     def __init__(self, app: Flask):
         self.app = app
@@ -55,13 +65,3 @@ class Mux:
         url_rule = f'/{_namespace}/{_endpoint}'
         endpoint = f'{_namespace}.{route.view_func.__name__}'
         return Rule(url_rule, endpoint, route.view_func)
-
-
-class Rule:
-    def __init__(self, rule: str = '', endpoint: str = '', view_func: callable = None):
-        self.rule = rule
-        self.endpoint = endpoint
-        self.view_func = view_func
-
-    def __repr__(self):
-        return f'rule: {self.rule} | endpoint: {self.endpoint}'

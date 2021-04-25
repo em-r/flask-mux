@@ -1,5 +1,6 @@
 from functools import wraps
 from typing import List, Callable
+from flask_mux.errors import MissingHandlerError, UncallableMiddlewareError
 
 
 class Router:
@@ -37,12 +38,13 @@ class Router:
             of middlewares.
         """
         if not middlewares:
-            raise Exception('route handler missing')
+            raise MissingHandlerError('no handler was provided')
 
         middlewares = list(middlewares)
         for mw in middlewares:
             if not isinstance(mw, Callable):
-                raise TypeError(f'{mw} is not callable')
+                raise UncallableMiddlewareError(
+                    'middelwares must be callable functions')
 
         view_func = middlewares.pop()
         if not middlewares:
