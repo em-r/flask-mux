@@ -10,6 +10,11 @@ def handle_basic():
     return {'success': True}
 
 
+@tc_default_router.route('/', http_methods=['POST'])
+def handle_basic_post():
+    return {'success': True}
+
+
 @tc_default_router.route('/<int:id>/<string:name>')
 def handle_with_params(id, name):
     return {'success': True, 'id': id, 'name': name}

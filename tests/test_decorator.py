@@ -20,6 +20,13 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(resp.json.get('success'))
 
+        resp = self.client.post('/')
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(resp.json.get('success'))
+
+        resp = self.client.put('/')
+        self.assertEqual(resp.status_code, 405)
+
     def test_with_params(self):
         """test Router.route decorator with path variables"""
         path_param_id = random.randint(0, 100)
