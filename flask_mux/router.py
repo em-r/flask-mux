@@ -3,6 +3,16 @@ from typing import List, Callable
 from flask_mux.errors import MissingHandlerError, UncallableMiddlewareError
 
 
+class Route:
+    def __init__(self, endpoint: str, view_func: Callable, http_methods: list = None):
+        self.endpoint: str = endpoint
+        self.view_func = view_func
+        self.http_methods = http_methods or ['GET']
+
+    def __repr__(self):
+        return f'{self.endpoint} -> {self.http_methods}'
+
+
 class Router:
     def __init__(self):
         self.routes: List[Route] = []
@@ -37,20 +47,25 @@ class Router:
             middlewares (*Callable): variadic param representing a sequence 
             of middlewares.
         """
+        middlewares = list(middlewares)
+        self._check_middlewares(middlewares)
+
+        route = self._create_route('GET', endpoint, middlewares)
+        self.routes.append(route)
+
+    def _check_middlewares(self, middlewares):
         if not middlewares:
             raise MissingHandlerError('no handler was provided')
 
-        middlewares = list(middlewares)
         for mw in middlewares:
             if not isinstance(mw, Callable):
                 raise UncallableMiddlewareError(
                     'middelwares must be callable functions')
 
+    def _create_route(self, method: str, endpoint: str, middlewares):
         view_func = middlewares.pop()
         if not middlewares:
-            route = Route(endpoint, view_func, http_methods=['GET'])
-            self.routes.append(route)
-            return
+            return Route(endpoint, view_func, http_methods=[method])
 
         mw = middlewares.pop(0)
 
@@ -58,16 +73,4 @@ class Router:
             mw = mw(middlewares.pop(0))
 
         view_func = mw(view_func)
-        route = Route(endpoint, view_func, http_methods=['GET'])
-        self.routes.append(route)
-        return
-
-
-class Route:
-    def __init__(self, endpoint: str, view_func: Callable, http_methods: list = None):
-        self.endpoint: str = endpoint
-        self.view_func = view_func
-        self.http_methods = http_methods or ['GET']
-
-    def __repr__(self):
-        return f'{self.endpoint} -> {self.http_methods}'
+        return Route(endpoint, view_func, http_methods=[method])
