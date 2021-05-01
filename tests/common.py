@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import request
+from flask import request, has_request_context
 import json
 
 
@@ -32,5 +32,13 @@ def is_auth(next_middleware):
     def wrapper(*args, **kwargs):
         if not request.headers.get('Authorization'):
             return {'success': False, 'message': 'unauthorized access'}, 401
+        return next_middleware(*args, **kwargs)
+    return wrapper
+
+
+def mock_middleware(next_middleware):
+    @wraps(next_middleware)
+    def wrapper(*args, **kwargs):
+        assert has_request_context()
         return next_middleware(*args, **kwargs)
     return wrapper
