@@ -93,7 +93,7 @@ class TestWithMiddlewares(unittest.TestCase):
         self.assertEqual(resp.status_code, 405)
 
     def test_multi_mws(self):
-        admin = 'Jax'
+        admin = 'Mehdi'
         headers = {
             'content-type': 'application/json',
             'admin': admin,
@@ -121,8 +121,7 @@ class TestWithMiddlewares(unittest.TestCase):
         self.assertEqual(resp.status_code, 400)
 
     def test_multi_mws_failing_1(self):
-        admin = 'Jax'
-        headers = {'admin': admin}
+        headers = {'admin': 'Mehdi'}
         resp = self.client.post('/multi-mws', headers=headers)
         self.assertEqual(resp.status_code, 401)
         self.assertEqual(resp.json.get('success'), False)
