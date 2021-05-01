@@ -1,6 +1,6 @@
 from flask import request
 from flask_mux import Router
-from tests.common import is_json, is_admin
+from tests.common import is_json, is_admin, is_auth
 
 tc_default_router = Router()
 
@@ -44,6 +44,7 @@ def handle_one_mw():
 
 
 @tc_mw_router.route('/multi-mws', http_methods=['POST'])
+@is_auth
 @is_admin
 @is_json
 def handle_multi_mws():

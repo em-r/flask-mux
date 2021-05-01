@@ -94,33 +94,53 @@ class TestWithMiddlewares(unittest.TestCase):
 
     def test_multi_mws(self):
         admin = 'Jax'
-        headers = {'content-type': 'application/json', 'admin': admin}
+        headers = {
+            'content-type': 'application/json',
+            'admin': admin,
+            'Authorization': 'whatever'
+        }
         resp = self.client.post('/multi-mws', headers=headers)
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.json.get('success'), True)
         self.assertEqual(resp.json.get('admin'), admin)
 
+        resp = self.client.post('/multi-mws')
+        self.assertEqual(resp.status_code, 401)
+
+        headers = {
+            'Authorization': 'whatever',
+        }
+        resp = self.client.post('/multi-mws', headers=headers)
+        self.assertEqual(resp.status_code, 403)
+
+        headers = {
+            'admin': admin,
+            'Authorization': 'whatever'
+        }
+        resp = self.client.post('/multi-mws', headers=headers)
+        self.assertEqual(resp.status_code, 400)
+
     def test_multi_mws_failing_1(self):
         admin = 'Jax'
         headers = {'admin': admin}
         resp = self.client.post('/multi-mws', headers=headers)
-        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(resp.status_code, 401)
         self.assertEqual(resp.json.get('success'), False)
         self.assertEqual(resp.json.get('message'),
-                         'request body must be valid json')
+                         'unauthorized access')
 
     def test_multi_mws_failing_2(self):
         headers = {'content-type': 'application/json'}
         resp = self.client.post('/multi-mws', headers=headers)
-        self.assertEqual(resp.status_code, 403)
+        self.assertEqual(resp.status_code, 401)
         self.assertEqual(resp.json.get('success'), False)
-        self.assertEqual(resp.json.get('message'), 'only admins are allowed')
+        self.assertEqual(resp.json.get('message'), 'unauthorized access')
 
     def test_multi_mws_preserve_order(self):
         resp = self.client.post('/multi-mws')
-        self.assertEqual(resp.status_code, 403)
+        self.assertEqual(resp.status_code, 401)
         self.assertEqual(resp.json.get('success'), False)
-        self.assertEqual(resp.json.get('message'), 'only admins are allowed')
+        self.assertEqual(resp.json.get('message'), 'unauthorized access')
 
 
 if __name__ == '__main__':
