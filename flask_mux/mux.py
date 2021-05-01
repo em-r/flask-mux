@@ -53,7 +53,7 @@ class Mux:
 
         # if namespace = '/' -> no modifications are needed for url rule and the endpoint
         if _namespace == '':
-            return Rule(route.endpoint, route.view_func.__name__, route.view_func)
+            return Rule(route.endpoint, route.unwrapped_view_func.__name__, route.view_func)
 
         """example for namespace != '/':
         namespace='/auth'       Route.endpoint='/login'     view_func.__name__='login_func'
@@ -63,5 +63,6 @@ class Mux:
         """
 
         url_rule = f'/{_namespace}/{_endpoint}'
-        endpoint = f'{_namespace}.{route.view_func.__name__}'
-        return Rule(url_rule, endpoint, route.view_func)
+        _namespace = _namespace.replace('/', '.')
+        endpoint_path = f'{_namespace}.{route.unwrapped_view_func.__name__}'
+        return Rule(url_rule, endpoint_path, route.view_func)

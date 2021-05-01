@@ -4,10 +4,11 @@ from flask_mux.errors import MissingHandlerError, UncallableMiddlewareError
 
 
 class Route:
-    def __init__(self, endpoint: str, view_func: Callable, http_methods: list = None):
+    def __init__(self, endpoint: str, view_func: Callable, http_methods: list = None, unwrapped=None):
         self.endpoint: str = endpoint
         self.view_func = view_func
         self.http_methods = http_methods or ['GET']
+        self.unwrapped_view_func = unwrapped or self.view_func
 
     def __repr__(self):
         return f'{self.endpoint} -> {self.http_methods}'
@@ -85,7 +86,12 @@ class Router:
 
         # call the self._wrap_view_func to wrap the view_function within
         # the provied the middlewares
-        return Route(endpoint, self._wrap_view_func(view_func, middlewares[:-1]), http_methods=[method])
+        return Route(
+            endpoint,
+            self._wrap_view_func(view_func, middlewares[:-1]),
+            http_methods=[method],
+            unwrapped=view_func
+        )
 
     def _wrap_view_func(self, view_func, middlewares: List):
         """ Returns a wrapper that wraps the view function
