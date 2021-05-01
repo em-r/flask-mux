@@ -53,7 +53,7 @@ class Router:
         route = self._create_route('GET', endpoint, middlewares)
         self.routes.append(route)
 
-    def _check_middlewares(self, middlewares):
+    def _check_middlewares(self, middlewares: list):
         if not middlewares:
             raise MissingHandlerError('no handler was provided')
 
@@ -62,15 +62,58 @@ class Router:
                 raise UncallableMiddlewareError(
                     'middelwares must be callable functions')
 
-    def _create_route(self, method: str, endpoint: str, middlewares):
-        view_func = middlewares.pop()
-        if not middlewares:
+    def _create_route(self, method: str, endpoint: str, middlewares: list):
+        """Calls the self._wrap_view_func to wrap the view function
+        within the provided middlwares, and then creates a new instance
+        of the Route class.
+
+        Args:
+            method (str): Request's HTTP method to be handled.
+            endpoint (str): Request's endpoint.
+            middlewares (list): list of middlewares to wrap the view_func.
+
+        Returns: Route
+        """
+        # extract the view function from the tail of the list
+        view_func = middlewares[-1]
+
+        # if there's only one element in the middlewares list
+        # that element is the view function, no wrapping needed
+        # returning the Route instance
+        if len(middlewares) == 1:
             return Route(endpoint, view_func, http_methods=[method])
 
-        mw = middlewares.pop(0)
+        # call the self._wrap_view_func to wrap the view_function within
+        # the provied the middlewares
+        return Route(endpoint, self._wrap_view_func(view_func, middlewares[:-1]), http_methods=[method])
 
-        while middlewares:
-            mw = mw(middlewares.pop(0))
+    def _wrap_view_func(self, view_func, middlewares: List):
+        """ Returns a wrapper that wraps the view function
+        within the the middlewares by ''dequeueing'' each middleware
+        from the passed middlewares list.
 
-        view_func = mw(view_func)
-        return Route(endpoint, view_func, http_methods=[method])
+        Args:
+            view_func (callable): view function.
+            middlewares (list): list of middlewares to wrap the view_func.
+
+        Returns:
+            callable: the new wrapped view function that will be passed to
+            the Flask.add_url_rule method.
+        """
+        def wrapper(*args, **kwargs):
+
+            # perform a deep copy of the middlewares list to not mutate it.
+            mws = middlewares.copy()
+            mw = mws.pop(0)
+
+            # loop until the copied list is empty
+            while mws:
+                # call each middleware by passing
+                # the next one as argument
+                mw = mw(mws.pop(0))
+
+            view_fn = mw(view_func)
+            if isinstance(view_fn, Callable):
+                return view_fn(*args, **kwargs)
+            return mw(view_func)
+        return wrapper
