@@ -54,6 +54,22 @@ class Router:
         route = self._create_route('GET', endpoint, middlewares)
         self.routes.append(route)
 
+    def post(self, endpoint: str, *middlewares):
+        """Handles incoming HTTP GET requests 
+        by executing the passed middlewares in
+        their respective order.
+
+        Args:
+            endpoint (str): endpoint to handle.
+            middlewares (*Callable): variadic param representing a sequence 
+            of middlewares.
+        """
+        middlewares = list(middlewares)
+        self._check_middlewares(middlewares)
+
+        route = self._create_route('POST', endpoint, middlewares)
+        self.routes.append(route)
+
     def _check_middlewares(self, middlewares: list):
         if not middlewares:
             raise MissingHandlerError('no handler was provided')
@@ -117,6 +133,12 @@ class Router:
                 # call each middleware by passing
                 # the next one as argument
                 mw = mw(mws.pop(0))
+
+            # if current mw is a tuple (not a callable -> not a view func)
+            # return the mw since it's the response that will be supplied
+            # to Flask
+            if isinstance(mw, tuple):
+                return mw
 
             view_fn = mw(view_func)
             if isinstance(view_fn, Callable):
