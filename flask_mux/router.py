@@ -4,10 +4,38 @@ from flask_mux.errors import MissingHandlerError, UncallableMiddlewareError
 
 
 class Route:
+    """Object representation of a route.
+
+    As the name implies, the Route class represents a route
+    by keeping track of the endpoint in question, the allowed
+    HTTP methods to be handled by the route, the view function
+    that is wrapped within middlewares which will be envoked 
+    when a request hits the endpoint and the pure view function.
+
+    The created instance will be used to create the url rule
+    which will be registered to the Flask url map.
+
+
+    Properties:
+        endpoint (str): 
+            the endpoint to be handled.
+
+        http_methods (List[str]): 
+            list of the HTTP methods that are allowed within the route.
+
+        view_func (Callable):
+            the view function wrapped within the provided middlewares
+            which will be registred with url rule.
+
+        unwrapped_view_func (Callable):
+            the unwrapped version of the view function.
+
+    """
+
     def __init__(self, endpoint: str, view_func: Callable, http_methods: list = None, unwrapped=None):
         self.endpoint: str = endpoint
-        self.view_func = view_func
         self.http_methods = http_methods or ['GET']
+        self.view_func = view_func
         self.unwrapped_view_func = unwrapped or self.view_func
 
     def __repr__(self):
@@ -15,6 +43,32 @@ class Route:
 
 
 class Router:
+    """A router that stores routes defined within a namespace.
+
+    The Router class implements a set of methods
+    that can be used to create new routes within a certain
+    namespace, which should be provided one registering
+    the Router with Mux.use method
+
+
+    A typical example:
+
+        auth_router = Router()
+        auth_router.post('/signin', signin_func)
+        auth_router.post('/signup', signup_func)
+
+        mux = Mux(app)
+        mux.use('/auth', auth_router)
+
+
+    Properties:
+        routes (List[Route]):
+            list of the routes defined within the namespace.
+            those routes are appended to the list automatically
+            when created using the methods the Router class
+            implements.
+    """
+
     def __init__(self):
         self.routes: List[Route] = []
 
