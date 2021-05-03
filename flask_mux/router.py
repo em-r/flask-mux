@@ -1,5 +1,5 @@
 from functools import wraps
-from typing import List, Callable
+from typing import List, Callable, Sequence
 from flask_mux.errors import MissingHandlerError, UncallableMiddlewareError
 
 
@@ -105,7 +105,7 @@ class Router:
         middlewares = list(middlewares)
         self._check_middlewares(middlewares)
 
-        route = self._create_route('GET', endpoint, middlewares)
+        route = self._create_route(['GET'], endpoint, middlewares)
         self.routes.append(route)
 
     def post(self, endpoint: str, *middlewares):
@@ -121,7 +121,7 @@ class Router:
         middlewares = list(middlewares)
         self._check_middlewares(middlewares)
 
-        route = self._create_route('POST', endpoint, middlewares)
+        route = self._create_route(['POST'], endpoint, middlewares)
         self.routes.append(route)
 
     def _check_middlewares(self, middlewares: list):
@@ -133,7 +133,7 @@ class Router:
                 raise UncallableMiddlewareError(
                     'middelwares must be callable functions')
 
-    def _create_route(self, method: str, endpoint: str, middlewares: list):
+    def _create_route(self, methods: Sequence[str], endpoint: str, middlewares: list):
         """Calls the self._wrap_view_func to wrap the view function
         within the provided middlwares, and then creates a new instance
         of the Route class.
@@ -145,6 +145,11 @@ class Router:
 
         Returns: Route
         """
+
+        # methods param must be an sequence (e.g: list, tuple)
+        # otherwise raise an assertionError
+        assert isinstance(methods, Sequence)
+
         # extract the view function from the tail of the list
         view_func = middlewares[-1]
 
@@ -152,14 +157,14 @@ class Router:
         # that element is the view function, no wrapping needed
         # returning the Route instance
         if len(middlewares) == 1:
-            return Route(endpoint, view_func, http_methods=[method])
+            return Route(endpoint, view_func, http_methods=[*set(methods)])
 
         # call the self._wrap_view_func to wrap the view_function within
         # the provied the middlewares
         return Route(
             endpoint,
             self._wrap_view_func(view_func, middlewares[:-1]),
-            http_methods=[method],
+            http_methods=[*set(methods)],
             unwrapped=view_func
         )
 
