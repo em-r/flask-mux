@@ -42,14 +42,14 @@ class Route:
         return f'{self.endpoint} -> {self.http_methods}'
 
     @classmethod
-    def create(cls, methods: Sequence[str], endpoint: str, middlewares: list):
+    def create(cls, endpoint: str, methods: Sequence[str], middlewares: list):
         """Calls the self._wrap_view_func to wrap the view function
         within the provided middlwares, and then creates a new instance
         of the Route class.
 
         Args:
-            method (str): Request's HTTP method to be handled.
             endpoint (str): Request's endpoint.
+            methods (Sequence): Request's HTTP method to be handled.
             middlewares (list): list of middlewares to wrap the view_func.
 
         Returns: Route
@@ -176,10 +176,10 @@ class Router:
             middlewares (*Callable): variadic param representing a sequence 
             of middlewares.
         """
-        middlewares = list(middlewares)
-        self._check_middlewares(middlewares)
+        # middlewares = list(middlewares)
+        # self._check_middlewares(middlewares)
 
-        route = Route.create(['GET'], endpoint, middlewares)
+        route = self._create_route(endpoint, ['GET'], *middlewares)
         self.routes.append(route)
 
     def post(self, endpoint: str, *middlewares):
@@ -192,13 +192,11 @@ class Router:
             middlewares (*Callable): variadic param representing a sequence 
             of middlewares.
         """
-        middlewares = list(middlewares)
-        self._check_middlewares(middlewares)
-
-        route = Route.create(['POST'], endpoint, middlewares)
+        route = self._create_route(endpoint, ['POST'], *middlewares)
         self.routes.append(route)
 
-    def _check_middlewares(self, middlewares: list):
+    @staticmethod
+    def _check_middlewares(middlewares: list):
         if not middlewares:
             raise MissingHandlerError('no handler was provided')
 
@@ -206,3 +204,9 @@ class Router:
             if not isinstance(mw, Callable):
                 raise UncallableMiddlewareError(
                     'middelwares must be callable functions')
+
+    def _create_route(self, endpoint: str, http_methods: list, *middlewares):
+        middlewares = list(middlewares)
+        self._check_middlewares(middlewares)
+
+        return Route.create(endpoint, http_methods, middlewares)
