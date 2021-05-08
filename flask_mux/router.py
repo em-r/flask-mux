@@ -41,6 +41,80 @@ class Route:
     def __repr__(self):
         return f'{self.endpoint} -> {self.http_methods}'
 
+    @classmethod
+    def create(cls, methods: Sequence[str], endpoint: str, middlewares: list):
+        """Calls the self._wrap_view_func to wrap the view function
+        within the provided middlwares, and then creates a new instance
+        of the Route class.
+
+        Args:
+            method (str): Request's HTTP method to be handled.
+            endpoint (str): Request's endpoint.
+            middlewares (list): list of middlewares to wrap the view_func.
+
+        Returns: Route
+        """
+
+        # methods param must be an sequence (e.g: list, tuple)
+        # otherwise raise an assertionError
+        assert isinstance(methods, Sequence)
+
+        # extract the view function from the tail of the list
+        view_func = middlewares[-1]
+
+        # if there's only one element in the middlewares list
+        # that element is the view function, no wrapping needed
+        # returning the Route instance
+        if len(middlewares) == 1:
+            return cls(endpoint, view_func, http_methods=[*set(methods)])
+
+        # call the self._wrap_view_func to wrap the view_function within
+        # the provied the middlewares
+        return cls(
+            endpoint,
+            cls._wrap_view_func(view_func, middlewares[:-1]),
+            http_methods=[*set(methods)],
+            unwrapped=view_func
+        )
+
+    @staticmethod
+    def _wrap_view_func(view_func, middlewares: List):
+        """ Returns a wrapper that wraps the view function
+        within the the middlewares by ''dequeueing'' each middleware
+        from the passed middlewares list.
+
+        Args:
+            view_func (callable): view function.
+            middlewares (list): list of middlewares to wrap the view_func.
+
+        Returns:
+            callable: the new wrapped view function that will be passed to
+            the Flask.add_url_rule method.
+        """
+        def wrapper(*args, **kwargs):
+
+            # perform a deep copy of the middlewares list to not mutate it.
+            mws = middlewares.copy()
+            mw = mws.pop(0)
+
+            # loop until the copied list is empty
+            while mws:
+                # call each middleware by passing
+                # the next one as argument
+                mw = mw(mws.pop(0))
+
+            # if current mw is a tuple (not a callable -> not a view func)
+            # return the mw since it's the response that will be supplied
+            # to Flask
+            if isinstance(mw, tuple):
+                return mw
+
+            view_fn = mw(view_func)
+            if isinstance(view_fn, Callable):
+                return view_fn(*args, **kwargs)
+            return mw(view_func)
+        return wrapper
+
 
 class Router:
     """A router that stores routes defined within a namespace.
@@ -105,7 +179,7 @@ class Router:
         middlewares = list(middlewares)
         self._check_middlewares(middlewares)
 
-        route = self._create_route(['GET'], endpoint, middlewares)
+        route = Route.create(['GET'], endpoint, middlewares)
         self.routes.append(route)
 
     def post(self, endpoint: str, *middlewares):
@@ -121,7 +195,7 @@ class Router:
         middlewares = list(middlewares)
         self._check_middlewares(middlewares)
 
-        route = self._create_route(['POST'], endpoint, middlewares)
+        route = Route.create(['POST'], endpoint, middlewares)
         self.routes.append(route)
 
     def _check_middlewares(self, middlewares: list):
@@ -132,75 +206,3 @@ class Router:
             if not isinstance(mw, Callable):
                 raise UncallableMiddlewareError(
                     'middelwares must be callable functions')
-
-    def _create_route(self, methods: Sequence[str], endpoint: str, middlewares: list):
-        """Calls the self._wrap_view_func to wrap the view function
-        within the provided middlwares, and then creates a new instance
-        of the Route class.
-
-        Args:
-            method (str): Request's HTTP method to be handled.
-            endpoint (str): Request's endpoint.
-            middlewares (list): list of middlewares to wrap the view_func.
-
-        Returns: Route
-        """
-
-        # methods param must be an sequence (e.g: list, tuple)
-        # otherwise raise an assertionError
-        assert isinstance(methods, Sequence)
-
-        # extract the view function from the tail of the list
-        view_func = middlewares[-1]
-
-        # if there's only one element in the middlewares list
-        # that element is the view function, no wrapping needed
-        # returning the Route instance
-        if len(middlewares) == 1:
-            return Route(endpoint, view_func, http_methods=[*set(methods)])
-
-        # call the self._wrap_view_func to wrap the view_function within
-        # the provied the middlewares
-        return Route(
-            endpoint,
-            self._wrap_view_func(view_func, middlewares[:-1]),
-            http_methods=[*set(methods)],
-            unwrapped=view_func
-        )
-
-    def _wrap_view_func(self, view_func, middlewares: List):
-        """ Returns a wrapper that wraps the view function
-        within the the middlewares by ''dequeueing'' each middleware
-        from the passed middlewares list.
-
-        Args:
-            view_func (callable): view function.
-            middlewares (list): list of middlewares to wrap the view_func.
-
-        Returns:
-            callable: the new wrapped view function that will be passed to
-            the Flask.add_url_rule method.
-        """
-        def wrapper(*args, **kwargs):
-
-            # perform a deep copy of the middlewares list to not mutate it.
-            mws = middlewares.copy()
-            mw = mws.pop(0)
-
-            # loop until the copied list is empty
-            while mws:
-                # call each middleware by passing
-                # the next one as argument
-                mw = mw(mws.pop(0))
-
-            # if current mw is a tuple (not a callable -> not a view func)
-            # return the mw since it's the response that will be supplied
-            # to Flask
-            if isinstance(mw, tuple):
-                return mw
-
-            view_fn = mw(view_func)
-            if isinstance(view_fn, Callable):
-                return view_fn(*args, **kwargs)
-            return mw(view_func)
-        return wrapper
