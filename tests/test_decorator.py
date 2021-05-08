@@ -1,21 +1,17 @@
 import unittest
 import random
 from string import ascii_letters
-from flask import Flask
-from flask_mux import Mux
-from tests.test_decorator_cases import tc_default_router, tc_mw_router
+from tests.test_base import FlaskMuxBaseTest
+from tests.test_cases.test_decorator import tc_default_router, tc_mw_router
 
 
-class TestBasic(unittest.TestCase):
+class TestBasic(FlaskMuxBaseTest):
     def setUp(self):
-        self.app = Flask(__name__)
-        router = Mux(self.app)
-        router.use('/', tc_default_router)
-
-        self.client = self.app.test_client()
+        super().setUp()
+        self.mux.use('/', tc_default_router)
 
     def test_default(self):
-        """test Router.route decorator with GET method"""
+        """test Router.route on a GET-only method"""
         resp = self.client.get('/')
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(resp.json.get('success'))
@@ -28,7 +24,7 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(resp.status_code, 405)
 
     def test_with_params(self):
-        """test Router.route decorator with path variables"""
+        """test Router.route with path variables"""
         path_param_id = random.randint(0, 100)
         path_param_name = ''.join(random.choices(ascii_letters, k=5))
         resp = self.client.get(f'/{path_param_id}/{path_param_name}')
@@ -38,6 +34,7 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(resp.json.get('name'), path_param_name)
 
     def test_post(self):
+        """test Router.route on a POST-only endpoint"""
         resp = self.client.post('/post')
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(resp.json.get('success'))
@@ -52,6 +49,7 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(resp.status_code, 405)
 
     def test_multiple_methods(self):
+        """test Router.route on an endpoint with multiple accepted HTTP methods"""
         resp = self.client.get('/many')
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.json.get('method'), 'GET')
@@ -67,15 +65,13 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(resp.status_code, 405)
 
 
-class TestWithMiddlewares(unittest.TestCase):
+class TestWithMiddlewares(FlaskMuxBaseTest):
     def setUp(self):
-        self.app = Flask(__name__)
-        router = Mux(self.app)
-        router.use('/', tc_mw_router)
-
-        self.client = self.app.test_client()
+        super().setUp()
+        self.mux.use('/', tc_mw_router)
 
     def test_one_mw(self):
+        """test Router.route with one middleware"""
         headers = {'content-type': 'application/json'}
         body = {'message': 'bit dodgy mate!'}
         resp = self.client.post('/one-mw', headers=headers, json=body)
@@ -84,6 +80,7 @@ class TestWithMiddlewares(unittest.TestCase):
         self.assertEqual(resp.json.get('body'), body)
 
     def test_one_mw_failing(self):
+        """test Router.route with one middleware"""
         resp = self.client.post('/one-mw')
         self.assertEqual(resp.status_code, 400)
         self.assertEqual(resp.json.get('success'), False)
@@ -93,6 +90,7 @@ class TestWithMiddlewares(unittest.TestCase):
         self.assertEqual(resp.status_code, 405)
 
     def test_multi_mws(self):
+        """test Router.route with multiple middlewares"""
         admin = 'Mehdi'
         headers = {
             'content-type': 'application/json',
@@ -121,6 +119,7 @@ class TestWithMiddlewares(unittest.TestCase):
         self.assertEqual(resp.status_code, 400)
 
     def test_multi_mws_failing_1(self):
+        """test Router.route with multiple middlewares"""
         headers = {'admin': 'Mehdi'}
         resp = self.client.post('/multi-mws', headers=headers)
         self.assertEqual(resp.status_code, 401)
@@ -129,6 +128,7 @@ class TestWithMiddlewares(unittest.TestCase):
                          'unauthorized access')
 
     def test_multi_mws_failing_2(self):
+        """test Router.route with multiple middlewares"""
         headers = {'content-type': 'application/json'}
         resp = self.client.post('/multi-mws', headers=headers)
         self.assertEqual(resp.status_code, 401)
@@ -136,6 +136,7 @@ class TestWithMiddlewares(unittest.TestCase):
         self.assertEqual(resp.json.get('message'), 'unauthorized access')
 
     def test_multi_mws_preserve_order(self):
+        """test Router.route with multiple middlewares (order preserving)"""
         resp = self.client.post('/multi-mws')
         self.assertEqual(resp.status_code, 401)
         self.assertEqual(resp.json.get('success'), False)

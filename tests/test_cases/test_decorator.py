@@ -1,6 +1,6 @@
 from flask import request
 from flask_mux import Router
-from tests.common import is_json, is_admin, is_auth
+from tests.test_cases.common import is_json, is_admin, is_auth
 
 tc_default_router = Router()
 

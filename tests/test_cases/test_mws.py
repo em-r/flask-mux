@@ -1,6 +1,6 @@
 from flask import request
 from flask_mux import Router
-from tests.common import is_auth, is_admin, is_json, mock_middleware
+from tests.test_cases.common import is_auth, is_admin, is_json, mock_middleware
 
 test_mws_router = Router()
 
