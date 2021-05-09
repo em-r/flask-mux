@@ -9,7 +9,7 @@ class Route:
     As the name implies, the Route class represents a route
     by keeping track of the endpoint in question, the allowed
     HTTP methods to be handled by the route, the view function
-    that is wrapped within middlewares which will be envoked 
+    that is wrapped within middlewares which will be envoked
     when a request hits the endpoint and the pure view function.
 
     The created instance will be used to create the url rule
@@ -17,10 +17,10 @@ class Route:
 
 
     Properties:
-        endpoint (str): 
+        endpoint (str):
             the endpoint to be handled.
 
-        http_methods (List[str]): 
+        http_methods (List[str]):
             list of the HTTP methods that are allowed within the route.
 
         view_func (Callable):
@@ -32,14 +32,20 @@ class Route:
 
     """
 
-    def __init__(self, endpoint: str, view_func: Callable, http_methods: list = None, unwrapped=None):
+    def __init__(
+        self,
+        endpoint: str,
+        view_func: Callable,
+        http_methods: list = None,
+        unwrapped=None,
+    ):
         self.endpoint: str = endpoint
-        self.http_methods = http_methods or ['GET']
+        self.http_methods = http_methods or ["GET"]
         self.view_func = view_func
         self.unwrapped_view_func = unwrapped or self.view_func
 
     def __repr__(self):
-        return f'{self.endpoint} -> {self.http_methods}'
+        return f"{self.endpoint} -> {self.http_methods}"
 
     @classmethod
     def create(cls, endpoint: str, methods: Sequence[str], middlewares: list):
@@ -50,7 +56,8 @@ class Route:
         Args:
             endpoint (str): Request's endpoint.
             methods (Sequence): Request's HTTP method to be handled.
-            middlewares (list): list of middlewares to wrap the view_func.
+            middlewares (list): list of middlewares to wrap the
+            view_func.
 
         Returns: Route
         """
@@ -74,26 +81,29 @@ class Route:
             endpoint,
             cls._wrap_view_func(view_func, middlewares[:-1]),
             http_methods=[*set(methods)],
-            unwrapped=view_func
+            unwrapped=view_func,
         )
 
     @staticmethod
     def _wrap_view_func(view_func, middlewares: List):
-        """ Returns a wrapper that wraps the view function
+        """Returns a wrapper that wraps the view function
         within the the middlewares by `dequeueing` each middleware
         from the passed middlewares list.
 
         Args:
             view_func (callable): view function.
-            middlewares (list): list of middlewares to wrap the view_func.
+            middlewares (list): list of middlewares to wrap the
+            view_func.
 
         Returns:
-            callable: the new wrapped view function that will be passed to
-            the Flask.add_url_rule method.
+            callable: the new wrapped view function that will be passed
+            to the Flask.add_url_rule method.
         """
+
         def wrapper(*args, **kwargs):
 
-            # perform a deep copy of the middlewares list to not mutate it.
+            # perform a deep copy of the middlewares list to not
+            # mutate it.
             mws = middlewares.copy()
             mw = mws.pop(0)
 
@@ -103,9 +113,10 @@ class Route:
                 # the next one as argument
                 mw = mw(mws.pop(0))
 
-            # if current mw is a tuple (not a callable -> not a view func)
-            # return the mw since it's the response that will be supplied
-            # to Flask
+            # if current mw is a tuple
+            # (not a callable -> not a view func)
+            # return the mw since it's the response that will be
+            # supplied to Flask
             if isinstance(mw, tuple):
                 return mw
 
@@ -113,6 +124,7 @@ class Route:
             if isinstance(view_fn, Callable):
                 return view_fn(*args, **kwargs)
             return mw(view_func)
+
         return wrapper
 
 
@@ -149,12 +161,15 @@ class Router:
     def route(self, endpoint: str, http_methods: list = None):
         """Acts similarly to :meth:`Flask.route` decorator.
         Appends a new Route instance to the self.routes list
-        which will be used to register all the routes with their endpoints.
+        which will be used to register all the routes with their
+        endpoints.
 
         Args:
             endpoint (str): endpoint to handle.
-            http_methods (list): allowed HTTP methods for the given endpoint.
+            http_methods (list): allowed HTTP methods for the given
+            endpoint.
         """
+
         def decorator(view_func):
             route = Route(endpoint, view_func, http_methods=http_methods)
             self.routes.append(route)
@@ -163,46 +178,48 @@ class Router:
             def wrapper(*args, **kwargs):
 
                 return view_func(*args, **kwargs)
+
             return wrapper
+
         return decorator
 
     def get(self, endpoint: str, *middlewares):
-        """Handles incoming HTTP GET requests 
+        """Handles incoming HTTP GET requests
         by executing the passed middlewares in
         their respective order.
 
         Args:
             endpoint (str): endpoint to handle.
-            middlewares (*Callable): variadic param representing a sequence 
-            of middlewares.
+            middlewares (*Callable): variadic param representing
+            a sequence of middlewares.
         """
-        route = self._create_route(endpoint, ['GET'], *middlewares)
+        route = self._create_route(endpoint, ["GET"], *middlewares)
         self.routes.append(route)
 
     def post(self, endpoint: str, *middlewares):
-        """Handles incoming HTTP POST requests 
+        """Handles incoming HTTP POST requests
         by executing the passed middlewares in
         their respective order.
 
         Args:
             endpoint (str): endpoint to handle.
-            middlewares (*Callable): variadic param representing a sequence 
-            of middlewares.
+            middlewares (*Callable): variadic param representing
+            a sequence  of middlewares.
         """
-        route = self._create_route(endpoint, ['POST'], *middlewares)
+        route = self._create_route(endpoint, ["POST"], *middlewares)
         self.routes.append(route)
 
     def put(self, endpoint: str, *middlewares):
-        """Handles incoming HTTP PUT requests 
+        """Handles incoming HTTP PUT requests
         by executing the passed middlewares in
         their respective order.
 
         Args:
             endpoint (str): endpoint to handle.
-            middlewares (*Callable): variadic param representing a sequence 
-            of middlewares.
+            middlewares (*Callable): variadic param representing
+            a sequence of middlewares.
         """
-        route = self._create_route(endpoint, ['PUT'], *middlewares)
+        route = self._create_route(endpoint, ["PUT"], *middlewares)
         self.routes.append(route)
 
     def delete(self, endpoint: str, *middlewares):
@@ -211,10 +228,10 @@ class Router:
 
         Args:
             endpoint (str): endpoint to handle.
-            middlewares (*Callable): variadic param representing a 
+            middlewares (*Callable): variadic param representing a
             sequence of middlewares.
         """
-        route = self._create_route(endpoint, ['DELETE'], *middlewares)
+        route = self._create_route(endpoint, ["DELETE"], *middlewares)
         self.routes.append(route)
 
     def handle(self, endpoint: str, *middlewares):
@@ -223,43 +240,39 @@ class Router:
 
         Args:
             endpoint (str): endpoint to handle.
-            middlewares (*Callable): variadic param representing a sequence 
-            of middlewares.
+            middlewares (*Callable): variadic param representing
+            a sequence of middlewares.
         """
         route = self._create_route(
-            endpoint,
-            ['GET', 'POST', 'PUT', 'DELETE'],
-            *middlewares
+            endpoint, ["GET", "POST", "PUT", "DELETE"], *middlewares
         )
         self.routes.append(route)
 
     @staticmethod
     def _check_middlewares(middlewares: list):
-        """Checks if the provided middlawares are valid callable 
+        """Checks if the provided middlawares are valid callable
         objects."""
 
         if not middlewares:
-            raise MissingHandlerError('no handler was provided')
+            raise MissingHandlerError("no handler was provided")
 
         for mw in middlewares:
             if not isinstance(mw, Callable):
                 raise UncallableMiddlewareError(
-                    'middelwares must be callable functions')
+                    "middelwares must be callable functions"
+                )
 
     def _create_route(
-        self,
-        endpoint: str,
-        http_methods: Sequence,
-        *middlewares
+        self, endpoint: str, http_methods: Sequence, *middlewares
     ) -> Route:
-        """Creates a new Route after checking if the provided 
+        """Creates a new Route after checking if the provided
         middlewares are valid by calling :meth:`_check_middlewares`
         on them.
 
         Args:
             endpoint (str): Request's endpoint.
             methods (Sequence): Request's HTTP method to be handled.
-            middlewares (variadic): list of middlewares to wrap the 
+            middlewares (variadic): list of middlewares to wrap the
             view_func.
 
         Returns: Route

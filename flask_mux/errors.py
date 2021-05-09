@@ -1,4 +1,3 @@
-
 class MuxError(BaseException):
     pass
 
