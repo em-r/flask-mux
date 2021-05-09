@@ -180,7 +180,7 @@ class Router:
         self.routes.append(route)
 
     def post(self, endpoint: str, *middlewares):
-        """Handles incoming HTTP GET requests 
+        """Handles incoming HTTP POST requests 
         by executing the passed middlewares in
         their respective order.
 
@@ -192,9 +192,52 @@ class Router:
         route = self._create_route(endpoint, ['POST'], *middlewares)
         self.routes.append(route)
 
+    def put(self, endpoint: str, *middlewares):
+        """Handles incoming HTTP PUT requests 
+        by executing the passed middlewares in
+        their respective order.
+
+        Args:
+            endpoint (str): endpoint to handle.
+            middlewares (*Callable): variadic param representing a sequence 
+            of middlewares.
+        """
+        route = self._create_route(endpoint, ['PUT'], *middlewares)
+        self.routes.append(route)
+
+    def delete(self, endpoint: str, *middlewares):
+        """Handles incoming HTTP DELETE requests.
+        Executes the passed middlewares in their respective order.
+
+        Args:
+            endpoint (str): endpoint to handle.
+            middlewares (*Callable): variadic param representing a 
+            sequence of middlewares.
+        """
+        route = self._create_route(endpoint, ['DELETE'], *middlewares)
+        self.routes.append(route)
+
+    def handle(self, endpoint: str, *middlewares):
+        """Handles all incoming requests regardless of the HTTP method
+        and executes the passed middlewares in their respective order.
+
+        Args:
+            endpoint (str): endpoint to handle.
+            middlewares (*Callable): variadic param representing a sequence 
+            of middlewares.
+        """
+        route = self._create_route(
+            endpoint,
+            ['GET', 'POST', 'PUT', 'DELETE'],
+            *middlewares
+        )
+        self.routes.append(route)
+
     @staticmethod
     def _check_middlewares(middlewares: list):
-        """Checks if the provided middlawares are valid callable objects."""
+        """Checks if the provided middlawares are valid callable 
+        objects."""
+
         if not middlewares:
             raise MissingHandlerError('no handler was provided')
 
@@ -203,14 +246,21 @@ class Router:
                 raise UncallableMiddlewareError(
                     'middelwares must be callable functions')
 
-    def _create_route(self, endpoint: str, http_methods: Sequence, *middlewares) -> Route:
-        """Creates a new Route after checking if the provided middlewares
-        are valid by calling :meth:`_check_middlewares` on them.
+    def _create_route(
+        self,
+        endpoint: str,
+        http_methods: Sequence,
+        *middlewares
+    ) -> Route:
+        """Creates a new Route after checking if the provided 
+        middlewares are valid by calling :meth:`_check_middlewares`
+        on them.
 
         Args:
             endpoint (str): Request's endpoint.
             methods (Sequence): Request's HTTP method to be handled.
-            middlewares (variadic): list of middlewares to wrap the view_func.
+            middlewares (variadic): list of middlewares to wrap the 
+            view_func.
 
         Returns: Route
         """
