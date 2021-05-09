@@ -6,8 +6,8 @@ class Rule:
     """Object representation of a URL rule.
 
     The Rule class is used to represent url rules upon 
-    when they are being registered using the 'Flask.add_url_rule' 
-    when calling the Mux.use method on a router.
+    when they are being registered using the :meth:`Flask.add_url_rule` 
+    when calling the :meth:`Mux.use` method on a router.
 
 
     Properties:
@@ -66,6 +66,20 @@ class Rule:
 
 
 class Mux:
+    """An object used as central registry to keep track and
+    register :class:`Router` instances.
+
+    Properties:
+        app (Flask): instance of the Flask app
+        rules (list): list of registered url rules
+
+    Methods:
+        use(namespace, route):
+            registers routes created within a :class:`Router` instance
+            with their endpoints.
+
+    """
+
     def __init__(self, app: Flask):
         self.app = app
         self.rules = []

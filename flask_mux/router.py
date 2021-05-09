@@ -43,7 +43,7 @@ class Route:
 
     @classmethod
     def create(cls, endpoint: str, methods: Sequence[str], middlewares: list):
-        """Calls the self._wrap_view_func to wrap the view function
+        """Calls the :meth`_wrap_view_func` to wrap the view function
         within the provided middlwares, and then creates a new instance
         of the Route class.
 
@@ -80,7 +80,7 @@ class Route:
     @staticmethod
     def _wrap_view_func(view_func, middlewares: List):
         """ Returns a wrapper that wraps the view function
-        within the the middlewares by ''dequeueing'' each middleware
+        within the the middlewares by `dequeueing` each middleware
         from the passed middlewares list.
 
         Args:
@@ -147,7 +147,7 @@ class Router:
         self.routes: List[Route] = []
 
     def route(self, endpoint: str, http_methods: list = None):
-        """Acts similarly to Flask.route decorator.
+        """Acts similarly to :meth:`Flask.route` decorator.
         Appends a new Route instance to the self.routes list
         which will be used to register all the routes with their endpoints.
 
@@ -176,9 +176,6 @@ class Router:
             middlewares (*Callable): variadic param representing a sequence 
             of middlewares.
         """
-        # middlewares = list(middlewares)
-        # self._check_middlewares(middlewares)
-
         route = self._create_route(endpoint, ['GET'], *middlewares)
         self.routes.append(route)
 
@@ -197,6 +194,7 @@ class Router:
 
     @staticmethod
     def _check_middlewares(middlewares: list):
+        """Checks if the provided middlawares are valid callable objects."""
         if not middlewares:
             raise MissingHandlerError('no handler was provided')
 
@@ -205,7 +203,17 @@ class Router:
                 raise UncallableMiddlewareError(
                     'middelwares must be callable functions')
 
-    def _create_route(self, endpoint: str, http_methods: list, *middlewares):
+    def _create_route(self, endpoint: str, http_methods: Sequence, *middlewares) -> Route:
+        """Creates a new Route after checking if the provided middlewares
+        are valid by calling :meth:`_check_middlewares` on them.
+
+        Args:
+            endpoint (str): Request's endpoint.
+            methods (Sequence): Request's HTTP method to be handled.
+            middlewares (variadic): list of middlewares to wrap the view_func.
+
+        Returns: Route
+        """
         middlewares = list(middlewares)
         self._check_middlewares(middlewares)
 
