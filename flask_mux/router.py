@@ -234,6 +234,18 @@ class Router:
         route = self._create_route(endpoint, ["DELETE"], *middlewares)
         self.routes.append(route)
 
+    def patch(self, endpoint: str, *middlewares):
+        """Handles incoming HTTP PATCH requests.
+        Executes the passed middlewares in their respective order.
+
+        Args:
+            endpoint (str): endpoint to handle.
+            middlewares (*Callable): variadic param representing a
+            sequence of middlewares.
+        """
+        route = self._create_route(endpoint, ["PATCH"], *middlewares)
+        self.routes.append(route)
+
     def handle(self, endpoint: str, *middlewares):
         """Handles all incoming requests regardless of the HTTP method
         and executes the passed middlewares in their respective order.
@@ -244,7 +256,7 @@ class Router:
             a sequence of middlewares.
         """
         route = self._create_route(
-            endpoint, ["GET", "POST", "PUT", "DELETE"], *middlewares
+            endpoint, ["GET", "POST", "PUT", "DELETE", "PATCH"], *middlewares
         )
         self.routes.append(route)
 
