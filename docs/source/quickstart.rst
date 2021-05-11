@@ -5,6 +5,10 @@ which will store routes registered within a single namespace,
 ``/`` in our case.
 
 
+.. toctree::
+   :maxdepth: 1
+
+
 Express-like approach
 -----------------------------
 
