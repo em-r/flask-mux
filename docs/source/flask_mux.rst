@@ -1,4 +1,4 @@
-flask\_mux package
+API Reference
 ==================
 
 Submodules

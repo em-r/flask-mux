@@ -11,9 +11,14 @@ class Rule:
 
 
     Properties:
-        rule (str): url rule to be registered.
-        endpoint (str): endpoint for the registered rule.
-        view_func (callable): function to be called when a request
+        rule (str): 
+            url rule to be registered.
+
+        endpoint (str): 
+            endpoint for the registered rule.
+
+        view_func (callable): 
+            function to be called when a request
             hits the endpoint.
 
 
@@ -36,10 +41,15 @@ class Rule:
         """Creates a Rule instance using the provided route properties.
 
         Args:
-            namespace (str): namespace which the route parameter
+
+            namespace (str): 
+                namespace which the route parameter
                 will be mapped to.
-            route (Route): route instance that will be registered
+
+            route (Route): 
+                route instance that will be registered
                 with the provided namespace.
+
 
         Returns:
             Rule: new Rule instance linked to the provided namespace.
@@ -73,9 +83,11 @@ class Mux:
     """An object used as central registry to keep track and
     register :class:`Router` instances.
 
+
     Properties:
         app (Flask): instance of the Flask app
         rules (list): list of registered url rules
+
 
     Methods:
         use(namespace, route):
@@ -92,12 +104,14 @@ class Mux:
         """Registers all the router's routes with their endpoints
         in the provided namespace.
 
+
         Example:
 
             use('/auth', auth_router) will take all the routes created
             using the auth_router, prepend '/auth' to each route's
             endpoint and then register the route with the final
             endpoint.
+
 
         Args:
             namespace (str): namespace which the routes will be mapped
