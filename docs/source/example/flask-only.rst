@@ -40,7 +40,7 @@ with this app to make it more modular.
     def logout():
         return { 'message': 'logged out' }
 
-    @app.route('/api/user/<int:id>')
+    @app.route('/api/users/<int:id>')
     @jwt_required
     def profile(id):
         return { 'user': id }

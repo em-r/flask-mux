@@ -19,7 +19,7 @@ with a full reference in the :doc:`flask_mux` section.
    
    quickstart
    example/index.rst
-   modules
+   flask_mux
 
 
 

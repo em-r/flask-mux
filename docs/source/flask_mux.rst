@@ -1,17 +1,6 @@
 API Reference
 ==================
 
-Submodules
-----------
-
-flask\_mux.errors module
-------------------------
-
-.. automodule:: flask_mux.errors
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 flask\_mux.mux module
 ---------------------
 
@@ -28,8 +17,14 @@ flask\_mux.router module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
+flask\_mux.errors module
+------------------------
+
+.. automodule:: flask_mux.errors
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 
 .. automodule:: flask_mux
    :members:

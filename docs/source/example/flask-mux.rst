@@ -17,7 +17,7 @@ in ``app.py`` module:
     from flask import Flask
     from flask_jwt_extended import JWTManager
     from flask_mux import Mux
-    from routes import index_router, auth_router, home_router
+    from routes import index_router, auth_router, users_router
 
     app = Flask(__name__)
     jwt = JWTManager(app)
@@ -25,7 +25,7 @@ in ``app.py`` module:
 
     mux.use('/', index_router)
     mux.use('/auth', auth_router)
-    mux.use('/api', api_router)
+    mux.use('/api/users', users_router)
 
 We also imported the routers for different namespaces that we are 
 going to create now.
@@ -88,9 +88,9 @@ Notice how we passed 2 functions in the last line!
     from flask_mux import Router
     from flask_jwt_extended import jwt_required
 
-    api_router = Router()
+    users_router = Router()
 
     def profile(id):
         return { 'user_id': id }
 
-    api_router.get('/user/<int:id>', jwt_required, profile)
+    users_router.get('/<int:id>', jwt_required, profile)
