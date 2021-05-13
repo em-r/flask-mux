@@ -1,6 +1,5 @@
 from functools import wraps
 from flask import request, has_request_context
-import json
 
 
 def is_json(next_middleware):
