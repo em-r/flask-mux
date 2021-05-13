@@ -1,6 +1,6 @@
 Flask-Mux's documentation!
 =====================================
-**Flask-Mux** is a lightweight Flask extension that provides a routing 
+**Flask-Mux** is a lightweight Flask_ extension that provides a routing 
 system similar to that of Express.js_. It basically wraps Flask's 
 url route registrations API to add more flexibility.
 
@@ -11,6 +11,7 @@ The rest of the docs describe each component of Flask in detail,
 with a full reference in the :doc:`flask_mux` section.
 
 
+.. _Flask: https://palletsprojects.com/p/flask/
 .. _Express.js: https://www.expressjs.com/
 .. _Installation: #id1
 
