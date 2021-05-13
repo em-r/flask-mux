@@ -4,7 +4,7 @@ from string import ascii_letters
 from flask import Flask
 from flask.testing import FlaskClient
 from flask_mux import Mux
-from tests.test_cases.test_decorator import tc_default_router
+from testing.test_cases.decorator import tc_default_router
 
 
 @pytest.fixture

@@ -1,6 +1,6 @@
 from flask import request
 from flask_mux import Router
-from tests.test_cases.common import is_auth, is_admin, is_json, mock_middleware
+from testing.common import is_auth, is_admin, is_json, mock_middleware
 
 test_mws_router = Router()
 
@@ -23,7 +23,8 @@ def get_with_extra_mws():
 
 test_mws_router.get("/basic", get_basic)
 test_mws_router.get("/get-with-auth", is_admin, get_with_auth)
-test_mws_router.get("/get-with-multi-mws", is_auth, is_admin, get_with_multi_mws)
+test_mws_router.get("/get-with-multi-mws", is_auth,
+                    is_admin, get_with_multi_mws)
 test_mws_router.get(
     "/get-with-extra-mws",
     mock_middleware,
@@ -94,7 +95,8 @@ def handle_with_extra_mws():
 
 test_mws_router.handle("/handle-basic", handle_basic)
 test_mws_router.handle("/handle-one-mw", is_auth, handle_with_one_mw)
-test_mws_router.handle("/handle-multi-mws", is_auth, is_json, handle_with_multi_mws)
+test_mws_router.handle("/handle-multi-mws", is_auth,
+                       is_json, handle_with_multi_mws)
 
 test_mws_router.handle(
     "/handle-extra-mws",

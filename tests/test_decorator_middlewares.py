@@ -2,7 +2,7 @@ import pytest
 from flask import Flask
 from flask.testing import FlaskClient
 from flask_mux import Mux
-from tests.test_cases.test_decorator import tc_mw_router
+from testing.test_cases.decorator import tc_mw_router
 
 
 @pytest.fixture

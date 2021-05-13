@@ -2,8 +2,8 @@ from flask.testing import FlaskClient
 import pytest
 from flask import Flask
 from flask_mux import Mux
-from tests.test_cases.test_mws import test_mws_router
 from testing import test_router
+from testing.test_cases.middlewares import test_mws_router
 
 
 @pytest.fixture
