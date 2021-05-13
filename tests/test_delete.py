@@ -1,92 +1,50 @@
-import unittest
-from tests.test_base import FlaskMuxBaseTest
+from flask.testing import FlaskClient
+import pytest
+from flask import Flask
+from flask_mux import Mux
 from tests.test_cases.test_mws import test_mws_router
+from testing import test_router
 
 
-class TestMwsDELETE(FlaskMuxBaseTest):
-    def setUp(self):
-        super().setUp()
-        self.mux.use('/', test_mws_router)
-        self.req_func = self.client.delete
-
-    def test_basic(self):
-        """test DELETE method with no middlewares"""
-        resp = self.req_func('/basic')
-        self.assertEqual(resp.status_code, 200)
-
-    def test_one_mw(self):
-        """test DELETE method with one middleware"""
-        body = {'message': 'samcro'}
-        resp = self.req_func('/one-mw', json=body)
-
-        self.assertEqual(resp.status_code, 200)
-        self.assertTrue(resp.json.get('success'))
-        self.assertDictEqual(resp.json.get('req_body'), body)
-
-    def test_one_mw_failing(self):
-        """test DELETE method with one middleware"""
-        resp = self.req_func('/one-mw')
-        self.assertEqual(resp.status_code, 400)
-        self.assertFalse(resp.json.get('success'))
-
-    def test_multi_mws(self):
-        """test DELETE method with multiple middleware"""
-        body = {'message': 'samcro'}
-        headers = {'Authorization': 'whatever'}
-        resp = self.req_func('/multi-mws', json=body, headers=headers)
-
-        self.assertEqual(resp.status_code, 200)
-        self.assertTrue(resp.json.get('success'))
-        self.assertDictEqual(resp.json.get('req_body'), body)
-
-    def test_multi_mws_failing(self):
-        """test DELETE method with multiple middleware"""
-        body = {'message': 'samcro'}
-        resp = self.req_func('/multi-mws', json=body)
-
-        self.assertEqual(resp.status_code, 401)
-        self.assertFalse(resp.json.get('success'))
-        self.assertEqual(resp.json.get('message'), 'unauthorized access')
-
-    def test_extra_mws(self):
-        """test DELETE method with many middleware"""
-        body = {'message': 'samcro'}
-        headers = {'Authorization': 'whatever', 'admin': 'Mehdi'}
-        resp = self.req_func('/extra-mws', json=body, headers=headers)
-
-        self.assertEqual(resp.status_code, 200)
-        self.assertTrue(resp.json.get('success'))
-        self.assertEqual(resp.json.get('admin'), headers.get('admin'))
-        self.assertDictEqual(resp.json.get('req_body'), body)
-
-    def test_extra_mws_failing_1(self):
-        """test DELETE method with many middleware"""
-        body = {'message': 'samcro'}
-        headers = {'admin': 'Mehdi'}
-        resp = self.req_func('/extra-mws', json=body, headers=headers)
-
-        self.assertEqual(resp.status_code, 401)
-        self.assertFalse(resp.json.get('success'))
-        self.assertEqual(resp.json.get('message'), 'unauthorized access')
-
-    def test_extra_mws_failing_2(self):
-        """test DELETE method with many middleware"""
-        body = {'message': 'samcro'}
-        headers = {'Authorization': 'whatever'}
-        resp = self.req_func('/extra-mws', json=body, headers=headers)
-
-        self.assertEqual(resp.status_code, 403)
-        self.assertFalse(resp.json.get('success'))
-        self.assertEqual(resp.json.get('message'), 'only admins are allowed')
-
-    def test_extra_mws_failing_3(self):
-        """test DELETE method with many middleware"""
-        headers = {'Authorization': 'whatever', 'admin': 'Mehdi'}
-        resp = self.req_func('/extra-mws', headers=headers)
-
-        self.assertEqual(resp.status_code, 400)
-        self.assertFalse(resp.json.get('success'))
+@pytest.fixture
+def client():
+    app = Flask(__name__)
+    mux = Mux(app)
+    mux.use('/', test_mws_router)
+    return app.test_client()
 
 
-if __name__ == '__main__':
-    unittest.main()
+def test_basic(client: FlaskClient):
+    return test_router.test_basic(client, 'delete')
+
+
+def test_one_mw(client: FlaskClient):
+    return test_router.test_one_mw(client, 'delete')
+
+
+def test_one_mw_failing(client: FlaskClient):
+    return test_router.test_one_mw_failing(client, 'delete')
+
+
+def test_multi_mws(client: FlaskClient):
+    return test_router.test_multi_mws(client, 'delete')
+
+
+def test_multi_mws_failing(client: FlaskClient):
+    return test_router.test_multi_mws_failing(client, 'delete')
+
+
+def test_extra_mws(client: FlaskClient):
+    return test_router.test_extra_mws(client, 'delete')
+
+
+def test_extra_mws_failing_1(client: FlaskClient):
+    return test_router.test_extra_mws_failing_1(client, 'delete')
+
+
+def test_extra_mws_failing_2(client: FlaskClient):
+    return test_router.test_extra_mws_failing_2(client, 'delete')
+
+
+def test_extra_mws_failing_3(client: FlaskClient):
+    return test_router.test_extra_mws_failing_3(client, 'delete')
