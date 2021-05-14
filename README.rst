@@ -1,6 +1,9 @@
 Flask-Mux
 ================
 
+|Build Status| |Latest Version| |Supported Python versions|
+|License|
+
 **Flask-Mux** is a lightweight Flask_ extension that provides a routing 
 system similar to that of Express.js_. It basically wraps Flask's 
 url route registrations API to add more flexibility.
@@ -48,12 +51,22 @@ User's Guide
 ------------
 You'll find the user guide and all documentation here_
 
-.. _here: https://flask-mux.readthedocs.com/
+.. _here: https://emr-flask-mux.readthedocs-hosted.com/en/latest/
 
 Links
 -----
 
--   Documentation: https://flask-mux.readthedocs.com/
+-   Documentation: https://emr-flask-mux.readthedocs-hosted.com/en/latest/ 
 -   PyPI Releases: https://pypi.org/project/Flask-Mux/
 -   Source Code: https://github.com/ElMehdi19/flask-mux/
 -   Issue Tracker: https://github.com/ElMehdi19/flask-mux/issues/
+
+
+.. |Build Status| image:: https://github.com/ElMehdi19/flask-mux/actions/workflows/tests.yml/badge.svg
+   :target: https://github.com/ElMehdi19/flask-mux/actions
+.. |Latest Version| image:: https://img.shields.io/pypi/v/Flask-Mux.svg
+   :target: https://pypi.python.org/pypi/Flask-Mux/
+.. |Supported Python versions| image:: https://img.shields.io/pypi/pyversions/Flask-Mux.svg
+   :target: https://img.shields.io/pypi/pyversions/Flask-Mux.svg
+.. |License| image:: http://img.shields.io/:license-mit-blue.svg
+   :target: https://pypi.python.org/pypi/Flask-Mux
