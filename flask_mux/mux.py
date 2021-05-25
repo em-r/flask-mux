@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, Blueprint
 from flask_mux.router import Router, Route
 
 
@@ -37,46 +37,22 @@ class Rule:
         return f"rule: {self.rule} | endpoint: {self.endpoint}"
 
     @classmethod
-    def create_from_route(cls, namespace: str, route: Route):
+    def create_from_route(cls, route: Route):
         """Creates a Rule instance using the provided route properties.
 
         Args:
 
-            namespace (str): 
-                namespace which the route parameter
-                will be mapped to.
-
-            route (Route): 
+           route (Route): 
                 route instance that will be registered
                 with the provided namespace.
 
 
         Returns:
-            Rule: new Rule instance linked to the provided namespace.
+            Rule: new Rule based on the provided Route instance. 
         """
-
-        _namespace = namespace.strip("/")
-        _endpoint = route.endpoint.strip("/")
-
-        # if namespace = '/' -> no modifications are needed for url rule and the endpoint
-        if _namespace == "":
-            return Rule(
-                route.endpoint, route.unwrapped_view_func.__name__, route.view_func
-            )
-
-        """example for namespace != '/':
-            namespace='/auth'      
-            Route.endpoint='/login'     
-            view_func.__name__='login_func'
-        
-        --> Rule.rule = '/auth/login'
-        --> Rule.endpoint = 'auth.login_func'
-        """
-
-        url_rule = f"/{_namespace}/{_endpoint}"
-        _namespace = _namespace.replace("/", ".")
-        endpoint_path = f"{_namespace}.{route.unwrapped_view_func.__name__}"
-        return Rule(url_rule, endpoint_path, route.view_func)
+        return Rule(
+            route.endpoint, route.unwrapped_view_func.__name__, route.view_func
+        )
 
 
 class Mux:
@@ -119,13 +95,14 @@ class Mux:
             router (Router): router instance with the registered
             routes.
         """
+        _namespace = namespace.strip('/').replace('/', '.')
+        bp = Blueprint(_namespace, self.app.name)
+
         for route in router.routes:
-            # rule = self._create_rule(namespace, route)
-            rule = Rule.create_from_route(namespace, route)
+            rule = Rule.create_from_route(route)
 
             if rule.view_func:
-                self.app.add_url_rule(
-                    rule.rule, rule.endpoint, rule.view_func, methods=route.http_methods
-                )
-
+                bp.add_url_rule(rule.rule, rule.endpoint,
+                                rule.view_func, methods=route.http_methods)
+                self.app.register_blueprint(bp, url_prefix=namespace)
                 self.rules.append(rule)
