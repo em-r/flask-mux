@@ -1,5 +1,6 @@
 from flask import Flask, Blueprint
 from flask_mux.router import Router, Route
+from typing import Dict, List
 
 
 class Rule:
@@ -74,7 +75,7 @@ class Mux:
 
     def __init__(self, app: Flask):
         self.app = app
-        self.rules = []
+        self.rules: Dict[str, List[Rule]] = {}
 
     def use(self, namespace: str, router: Router):
         """Registers all the router's routes with their endpoints
@@ -97,6 +98,9 @@ class Mux:
         """
         _namespace = namespace.strip('/').replace('/', '.')
         bp = Blueprint(_namespace, self.app.name)
+        if not self.rules.get(_namespace):
+            self.rules[_namespace] = []
+        bp_rules = self.rules.get(_namespace)
 
         for route in router.routes:
             rule = Rule.create_from_route(route)
@@ -105,4 +109,4 @@ class Mux:
                 bp.add_url_rule(rule.rule, rule.endpoint,
                                 rule.view_func, methods=route.http_methods)
                 self.app.register_blueprint(bp, url_prefix=namespace)
-                self.rules.append(rule)
+                bp_rules.append(rule)
