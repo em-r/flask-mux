@@ -1,7 +1,7 @@
 Flask-Mux
 ================
 
-|Build Status| |Latest Version| |Supported Python versions|
+|Build Status| |Downloads| |Latest Version| |Supported Python versions|
 |License|
 
 **Flask-Mux** is a lightweight Flask_ extension that provides a routing 
@@ -69,4 +69,6 @@ Links
 .. |Supported Python versions| image:: https://img.shields.io/pypi/pyversions/Flask-Mux.svg
    :target: https://img.shields.io/pypi/pyversions/Flask-Mux.svg
 .. |License| image:: http://img.shields.io/:license-mit-blue.svg
+   :target: https://pypi.python.org/pypi/Flask-Mux
+.. |Downloads| image:: https://static.pepy.tech/personalized-badge/flask-mux?period=total&units=international_system&left_color=black&right_color=blue&left_text=Downloads 
    :target: https://pypi.python.org/pypi/Flask-Mux
