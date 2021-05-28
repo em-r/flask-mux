@@ -2,7 +2,7 @@ from flask import request
 from flask_mux import Router
 from testing.common import is_json, is_admin, is_auth
 
-tc_default_router = Router()
+tc_default_router = Router(__name__)
 
 
 @tc_default_router.route('/')
@@ -30,7 +30,7 @@ def handle_many():
     return {'success': True, 'method': request.method}
 
 
-tc_mw_router = Router()
+tc_mw_router = Router(__name__)
 
 
 @tc_mw_router.route('/one-mw', http_methods=['POST'])

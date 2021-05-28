@@ -97,7 +97,7 @@ class Mux:
             routes.
         """
         _namespace = namespace.strip('/').replace('/', '.')
-        bp = Blueprint(_namespace, self.app.name)
+        bp = Blueprint(_namespace, router.name)
         if not self.rules.get(_namespace):
             self.rules[_namespace] = []
         bp_rules = self.rules.get(_namespace)
@@ -108,5 +108,6 @@ class Mux:
             if rule.view_func:
                 bp.add_url_rule(rule.rule, rule.endpoint,
                                 rule.view_func, methods=route.http_methods)
-                self.app.register_blueprint(bp, url_prefix=namespace)
                 bp_rules.append(rule)
+
+        self.app.register_blueprint(bp, url_prefix=namespace)

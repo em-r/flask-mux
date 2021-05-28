@@ -139,7 +139,7 @@ class Router:
 
     A typical example:
 
-        auth_router = Router()
+        auth_router = Router(__name__)
         auth_router.post('/signin', signin_func)
         auth_router.post('/signup', signup_func)
 
@@ -148,6 +148,8 @@ class Router:
 
 
     Properties:
+        name (str):
+            Router name usualy set to `__name__`
         routes (List[Route]):
             list of the routes defined within the namespace.
             those routes are appended to the list automatically
@@ -155,7 +157,8 @@ class Router:
             implements.
     """
 
-    def __init__(self):
+    def __init__(self, name: str):
+        self.name = name
         self.routes: List[Route] = []
 
     def route(self, endpoint: str, http_methods: list = None):

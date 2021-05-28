@@ -2,7 +2,7 @@ from flask import request
 from flask_mux import Router
 from testing.common import is_auth, is_admin, is_json, mock_middleware
 
-test_mws_router = Router()
+test_mws_router = Router(__name__)
 
 
 def get_basic():
