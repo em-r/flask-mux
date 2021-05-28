@@ -27,7 +27,7 @@ Express-like approach
     def about():
         return 'about'
 
-    index_router = Router()
+    index_router = Router(__name__)
     index_router.get('/', home)
     index_router.get('/about', about)
 
@@ -46,7 +46,7 @@ Using the route decorator
     app = Flask(__name__)
     mux = Mux(app)
 
-    index_router = Router()
+    index_router = Router(__name__)
 
     @index_router.route('/')
     def home():

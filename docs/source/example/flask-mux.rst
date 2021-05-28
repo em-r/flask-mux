@@ -46,7 +46,7 @@ For each router, we'll create a seperate module in the routes package.
 
     from flask_mux import Router
 
-    index_router = Router()
+    index_router = Router(__name__)
 
     def home():
         return 'home page'
@@ -61,7 +61,7 @@ For each router, we'll create a seperate module in the routes package.
     from flask_mux import Router
     from flask_jwt_extended import create_access_token, jwt_required
 
-    auth_router = Router()
+    auth_router = Router(__name__)
 
     def login():
         identity = {'user_id': 1234}
@@ -88,7 +88,7 @@ Notice how we passed 2 functions in the last line!
     from flask_mux import Router
     from flask_jwt_extended import jwt_required
 
-    users_router = Router()
+    users_router = Router(__name__)
 
     def profile(id):
         return { 'user_id': id }
