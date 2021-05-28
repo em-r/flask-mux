@@ -40,7 +40,7 @@ A Simple Example
     def about():
         return 'about'
 
-    index_router = Router()
+    index_router = Router(__name__)
     index_router.get('/', home)
     index_router.get('/about', about)
 
