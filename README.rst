@@ -51,12 +51,12 @@ User's Guide
 ------------
 You'll find the user guide and all documentation here_
 
-.. _here: https://emr-flask-mux.readthedocs-hosted.com/en/latest/
+.. _here: https://flask-mux.readthedocs.io/en/latest/
 
 Links
 -----
 
--   Documentation: https://emr-flask-mux.readthedocs-hosted.com/en/latest/ 
+-   Documentation: https://flask-mux.readthedocs.io/en/latest/
 -   PyPI Releases: https://pypi.org/project/Flask-Mux/
 -   Source Code: https://github.com/ElMehdi19/flask-mux/
 -   Issue Tracker: https://github.com/ElMehdi19/flask-mux/issues/
@@ -71,4 +71,4 @@ Links
 .. |License| image:: http://img.shields.io/:license-mit-blue.svg
    :target: https://pypi.python.org/pypi/Flask-Mux
 .. |Downloads| image:: https://static.pepy.tech/personalized-badge/flask-mux?period=total&units=international_system&left_color=black&right_color=blue&left_text=Downloads 
-   :target: https://pypi.python.org/pypi/Flask-Mux
+   :target: https://pepy.tech/project/flask-mux
